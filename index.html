@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Numia Turnos</title>
+  <link rel="icon" type="image/png" href="images/icon.png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --numia-azul: #be002f;               /* tono más */
+      --numia-azul-claro: #ffffff;
+      --numia-azul-muy-claro: #eef2fc;
+    }
+    body { font-family: 'Roboto', Arial, sans-serif; background: #f7f7f7; }
+    .numia-link {
+      color: inherit;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    .numia-link:visited {
+      color: inherit;
+      text-decoration: underline;
+    }
+    .numia-link:hover {
+      color: inherit;
+      text-decoration: underline;
+    }
+    .card.ad-card { border-radius: 1.2rem; box-shadow: 0 4px 18px rgba(0,0,0,0.08); transition: transform .18s, box-shadow .18s; min-width:210px; min-height:380px; display:flex; flex-direction:column; justify-content:stretch; height:100%; }
+    .card.ad-card:hover { transform: translateY(-4px) scale(1.025); box-shadow: 0 8px 32px rgba(0,19,145,0.17); }
+    .card-img-top-holder { width:100%; height:180px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fff; border-top-left-radius:1.2rem; border-top-right-radius:1.2rem; }
+    .card-img-top-holder img { width:100%; height:100%; object-fit:cover; object-position:center; transition: transform .3s; }
+    .ad-card .card-body { display:flex; flex-direction:column; justify-content:flex-start; height:100%; padding-bottom:1.5rem; }
+    .ad-card .card-title { font-weight:700; color:var(--numia-azul); font-size:1.25rem; margin-bottom:.25rem; margin-top:1rem; min-height:3rem; display:flex; align-items:center; justify-content:center; text-align:center; }
+    .ad-card .card-text { font-size:1.01rem; color:#2d2d2d; font-weight:500; opacity:.9; margin-bottom:1.1rem; min-height:56px; text-align:center; display:flex; align-items:center; justify-content:center; }
+    @media (max-width:991px){ .main-cards .col-lg-3 {flex:0 0 50%; max-width:50%; margin-bottom:1rem;} }
+    @media (max-width:767px){ .main-cards .col-lg-3 {flex:0 0 100%; max-width:100%;} .card-img-top-holder{height:140px;} .ad-card .card-title{font-size:1.08rem;} }
+
+    /* Sección informativa (antes rates) */
+    .rates-section{ display:flex; gap:2.2rem; align-items:stretch; margin:36px 0 0; width:100%; flex-wrap:wrap;}
+    .rates-col-table, .rates-col-side { background:#fff; border-radius:1.1rem; box-shadow:0 2px 12px rgba(0,0,0,0.07); padding:2.1rem 1.6rem 1.6rem 1.7rem; }
+    .rates-col-table{ min-width:340px; flex:2 1 540px; max-width:1000px; display:flex; flex-direction:column; justify-content:flex-start;}
+    .rates-col-side{ min-width:220px; flex:1 1 320px; max-width:420px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start;}
+    .rates-col-side .bi{ font-size:2.6rem; color:var(--numia-azul); margin-bottom:.7rem;}
+    .rates-col-side h5{ color:var(--numia-azul); font-weight:700; margin-bottom:.5rem; font-size:1.2rem;}
+    .rates-col-side p{ color:#444; font-size:1.07rem; font-weight:500; margin-bottom:1.2rem; opacity:.93;}
+    .rates-col-side .btn{ background:var(--numia-azul); border:none; color:#fff; font-weight:700; border-radius:24px; padding:.7rem 2.1rem; font-size:1.07rem; box-shadow:0 2px 7px rgba(0,19,145,0.06);}
+    .rates-col-side .btn:hover{ background:#003a7a; color:#fff;}
+    .rates-tab-btn{ padding:.7rem 0; border:none; border-radius:9px; font-weight:bold; font-size:1.1rem; background:#fff; color:var(--numia-azul); margin-bottom:0; cursor:pointer; border:2px solid #d1d9f9; min-width:70px;}
+    .rates-tab-btn.active,.rates-tab-btn:focus{ background:var(--numia-azul); color:#fff; border:2px solid var(--numia-azul);}
+    .rates-table{ width:100%; border-collapse:separate; border-spacing:0; background:#fff; border-radius:.8rem; overflow:hidden; margin-top:.7rem;}
+    .rates-table th,.rates-table td{ padding:12px 18px; font-size:1.04rem; text-align:left;}
+    .rates-table th{ color:var(--numia-azul); background:var(--numia-azul-claro); border:none; font-size:1.08rem; font-weight:700; text-align:center; letter-spacing:.02em;}
+    .rates-table tr:not(:last-child){ border-bottom:1px solid #cde0f8;}
+    .rates-table tr:nth-child(2){ background:var(--numia-azul-claro);} .rates-table tr:nth-child(3){ background:var(--numia-azul-muy-claro);}
+    .rates-table td{ color:#222; font-weight:500; text-align:center; vertical-align:middle;}
+    .rates-table td:first-child,.rates-table th:first-child{ text-align:left;}
+    @media (max-width:1300px){ .rates-col-table{min-width:0; flex-basis:400px;} .rates-col-side{min-width:0;} }
+    @media (max-width:991px){ .rates-section{flex-direction:column; gap:1.4rem;} .rates-col-table,.rates-col-side{min-width:0; max-width:100%;} .rates-col-side{align-items:flex-start; padding-top:1.2rem;} }
+
+    .btn-primary{ background-color:var(--numia-azul)!important; border-color:var(--numia-azul)!important;}
+    .btn-primary:hover{ background-color:#003a7a!important; border-color:#003a7a!important;}
+    .btn-outline-primary{ color:var(--numia-azul)!important; border-color:var(--numia-azul)!important;}
+    .btn-outline-primary:hover{ background-color:var(--numia-azul)!important; color:#fff!important;}
+    #max-chat{ background:var(--numia-azul)!important;} #open-chat{ background:var(--numia-azul)!important;}
+
+    /* --------- Sala de espera / Videollamada --------- */
+    .modal-wait .info-item{ display:flex; justify-content:space-between; align-items:center; padding:.8rem 1rem; border:1px solid #e7e9ff; border-radius:.6rem; background:linear-gradient(135deg,#f8f9ff,#eef2ff);}
+    .modal-wait .info-label{ font-weight:600; color:#4b5563; }
+    .modal-wait .info-value{ font-weight:700; color:#6d28d9; }
+    .badge-live{ background:#22c55e; }
+    .status-warn{ color:#f59e0b; font-weight:700; }
+    .status-ok{ color:#22c55e; font-weight:700; }
+    .status-done{ color:#06b6d4; font-weight:700; }
+    .status-err{ color:#ef4444; font-weight:700; }
+    .modal-video .modal-dialog{ width:var(--video-width, 90vw); max-width:100%; }
+    .modal-video .modal-content{ height:var(--video-height, 80vh); }
+    .modal-video iframe{ width:100%; height:100%; border:0; border-radius:.5rem; }
+
+    /* --------- Citas (estilos chips/horas) --------- */
+    #modalCita .modal-dialog { max-width: 920px; }
+    #modalCita .modal-content { border-radius: 16px; border: 0; box-shadow: 0 14px 40px rgba(0,0,0,.12); }
+    #modalCita .modal-header { border-bottom: 1px solid #eef2fc; }
+    #modalCita .modal-body { padding-top: .75rem; }
+    .cita-toolbar { position: sticky; top: 0; z-index: 2; background: #fff; padding-bottom: .5rem; margin-bottom: .75rem; border-bottom: 1px solid #eef2fc; }
+    #citaSchedule, #citaBranch, #citaFecha { border-radius: 10px; }
+    #citaSlots { display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:.5rem; max-height:320px; overflow:auto; padding-right:.25rem; }
+    #citaSlots .btn { border-radius:10px; border:1px solid #c9b6ff; font-weight:600; padding:.45rem .3rem; }
+    #citaSlots .btn:hover { background:#f6f3ff; }
+    #citaSlots .btn.active, #citaSlots .btn:focus { background:var(--numia-azul); color:#fff; border-color:var(--numia-azul); }
+    .cita-legend { font-size:.8rem; color:#6c6c7a; }
+    @media (max-width:576px){ #citaSlots { max-height:260px; } }
+    /* Código de turno más discreto */
+
+    /* Estado “le estamos llamando” más notorio (parpadeo) */
+    .status-call{
+      color:#fff; background:#22c55e;
+      padding:.25rem .6rem; border-radius:.5rem;
+      display:inline-block; animation:pulseGlow 1.2s ease-in-out infinite;
+    }
+    @keyframes pulseGlow{
+      0%{ box-shadow:0 0 0 0 rgba(34,197,94,.45); }
+      70%{ box-shadow:0 0 0 10px rgba(34,197,94,0); }
+      100%{ box-shadow:0 0 0 0 rgba(34,197,94,0); }
+    }
+
+    /* --------- Estilos Mapfre para botones alternativos --------- */
+    .modal-wait .alternatives-section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+    .modal-wait .alternatives-title {
+      color: #1a1a1a;
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+    .modal-wait .alternatives-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .modal-wait .alternatives-row {
+      display: flex;
+      gap: 0.75rem;
+      width: 100%;
+    }
+    .modal-wait .alternatives-row .alternative-btn {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    .modal-wait .alternative-btn {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #333;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 0.75rem;
+    }
+    .modal-wait .alternative-btn:last-child {
+      margin-bottom: 0;
+    }
+    @media (max-width: 576px) {
+      .modal-wait .alternatives-row {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+    }
+    .modal-wait .alternative-btn:hover {
+      background: #f5f5f5;
+      border-color: #d0d0d0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+      color: #000;
+    }
+    .modal-wait .alternative-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .modal-wait .alternative-btn i {
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      width: 24px;
+      text-align: center;
+    }
+    .modal-wait .alternative-btn.btn-cita i {
+      color: #d32f2f;
+    }
+    .modal-wait .alternative-btn.btn-whatsapp i {
+      color: #25d366;
+    }
+    .modal-wait .alternative-btn.btn-agent i {
+      color: #757575;
+    }
+    .modal-wait .alternative-btn:disabled {
+      background: #f5f5f5;
+      color: #9e9e9e;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .modal-wait .alternative-btn:disabled:hover {
+      transform: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* Tooltip discreto */
+    .tooltip-discreto {
+      transition: opacity 0.2s ease;
+    }
+    .tooltip-discreto:hover {
+      opacity: 0.9 !important;
+    }
+
+    /* Evitar color azul del autocompletado */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active,
+    input.form-control:-webkit-autofill,
+    input.form-control:-webkit-autofill:hover,
+    input.form-control:-webkit-autofill:focus,
+    input.form-control:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px white inset !important;
+      -webkit-text-fill-color: #212529 !important;
+      box-shadow: 0 0 0 1000px white inset !important;
+      background-color: white !important;
+      background-clip: padding-box !important;
+      transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s !important;
+    }
+    input:-webkit-autofill::first-line {
+      color: #212529 !important;
+      font-size: inherit !important;
+      font-family: inherit !important;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm py-2 mb-0">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <a href="https://www.mapfre.com.co/" target="_blank" class="d-block">
+          <img src="images/mapfrelogo.png" alt="Numia Logo" class="img-fluid" style="max-height: 75px;" />
+        </a>
+      </div>
+      <p class="lead mt-2 mb-0 text-dark text-start" style="font-size:1rem;">
+        Servicios digitales para la gestión de turnos de <strong><a href="https://numia.co" target="_blank" class="numia-link">Numia</a></strong>
+      </p>
+    </div>
+  </header>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom" style="z-index:1050;">
+    <div class="container">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-center" id="navbarMain">
+        <ul class="navbar-nav mb-2 mb-lg-0">
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Tarjetas -->
+  <main class="container mb-5 flex-grow-1 d-flex align-items-center" style="padding-top: 4rem;">
+    <div class="row g-4 justify-content-center main-cards w-100">
+      <!-- Turno servicios escolares (fila virtual) -->
+      <div class="col-lg-3 col-md-6">
+        <div class="card ad-card h-100 text-center">
+          <div class="card-img-top-holder">
+            <img src="images/serviciosescolares.png" alt="Turno físico">
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Turno para atención presencial</h5>
+            <p class="card-text">Obtén un turno para atención presencial en ventanilla.</p>
+            <button id="btnTurnoPresencial" class="btn btn-outline-primary rounded-pill px-4 mt-2 fw-bold">Generar turno</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Turno virtual -->
+      <div class="col-lg-3 col-md-6">
+        <div class="card ad-card h-100 text-center">
+          <div class="card-img-top-holder">
+            <img src="images/filavirtual.jpg" alt="Turno virtual">
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Turno virtual</h5>
+            <p class="card-text">Solicita un turno para atención por videollamada.</p>
+            <button id="btnGenerarturno" class="btn btn-primary rounded-pill px-4 mt-2 fw-bold">Generar turno</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-light text-center py-3 mt-auto border-top">
+    <small>&copy; Numia Turnos - Demo. Todos los derechos reservados.</small>
+  </footer>
+
+  <!-- ===== MODALES: Turno/Sala/Video (existentes) ===== -->
+  <div class="modal fade" id="modalGuardiaForm" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-person-vcard me-2"></i>Turno presencial</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="formAlert" class="alert d-none"></div>
+          <form id="guardiaForm" class="row g-3">
+            <div class="col-md-6"><label class="form-label fw-semibold">Nombre</label><input type="text" class="form-control" name="firstName" required></div>
+            <div class="col-md-6"><label class="form-label fw-semibold">Apellido</label><input type="text" class="form-control" name="lastName" required></div>
+            <div class="col-md-6"><label class="form-label fw-semibold">Identificación</label><input type="text" class="form-control" name="dni" required></div>
+            <div class="col-md-6"><label class="form-label fw-semibold">Teléfono</label><input type="tel" class="form-control" name="phone" required></div>
+            <div class="col-12"><label class="form-label fw-semibold">Email</label><input type="email" class="form-control" name="email" required></div>
+          </form>
+          <div class="small text-muted mt-3">Al continuar, te asignaremos un turno y verás una sala de espera. Cuando el agente esté listo, podrás iniciar una videollamada.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button id="btnEnviarTurno" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i>Generar turno</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade modal-wait" id="modalSalaEspera" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-clock-history me-2"></i>RESERVA TU TURNO</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" id="btnCloseWait"></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center mb-4">
+            <div class="mb-3">
+              <span class="badge badge-live rounded-pill px-3 py-2">
+                <i class="bi bi-check2-circle me-1"></i>Turno Reservado Exitosamente
+              </span>
+            </div>
+            <div class="mb-3">
+              <div class="d-inline-flex align-items-center gap-2">
+                <span class="fw-bold" style="font-size: 1.5rem;">Número de Turno: <span id="turnNumber">—</span></span>
+                <span 
+                  class="tooltip-discreto" 
+                  style="cursor: pointer; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #9ca3af; opacity: 0.6;"
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  data-bs-title="Código: —"
+                  id="turnCodeTooltip">
+                  ?
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Estado del Turno:</div>
+                <div class="info-value status-warn" id="turnStatus">Consultando...</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Tiempo Promedio de Espera:</div>
+                <div class="info-value" id="avgWaitingTime">N/A</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Cola/Servicio:</div>
+                <div class="info-value" id="queueName">—</div>
+              </div>
+            </div>
+          </div>
+          <!-- OJO: se retiraron "Tiempo de Espera Actual", "Sala de Espera"
+              y el botón/texto de videollamada por atención presencial -->
+
+          <hr class="my-4">
+
+          <div class="alternatives-section">
+            <div class="alternatives-title">Si no quieres esperar, también puedes:</div>
+            <div class="alternatives-buttons">
+              <div class="alternatives-row">
+                <a href="https://citas.debmedia.com/#/company/Mapfre/schedule" target="_blank" class="alternative-btn btn-cita">
+                  <i class="bi bi-calendar-check"></i>
+                  <span>Generar cita</span>
+                </a>
+                <a href="https://wa.me/5215560404738?text=Hola,%20Asistente%20IA%20de%20Mapfre." target="_blank" class="alternative-btn btn-whatsapp">
+                  <i class="bi bi-whatsapp"></i>
+                  <span>Chatbot whatsapp</span>
+                </a>
+              </div>
+              <button type="button" class="alternative-btn btn-agent" disabled>
+                <i class="bi bi-person-headset"></i>
+                <span>Hablar con un agente disponible</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade modal-video" id="modalVideo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-2">
+        <div class="d-flex justify-content-between align-items-center px-2">
+          <h6 class="m-0"><i class="bi bi-camera-video me-2"></i>Videollamada</h6>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary" id="btnResizeVideo">Cambiar tamaño</button>
+            <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+        </div>
+        <div class="mt-2 h-100">
+          <iframe id="videoFrame" src="about:blank"
+            allow="camera; microphone; autoplay; fullscreen; clipboard-write; display-capture"
+            referrerpolicy="no-referrer" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL CITAS ===== -->
+  <div class="modal fade" id="modalCita" tabindex="-1" aria-labelledby="modalCitaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCitaLabel"><i class="bi bi-calendar2-week me-2"></i>Agenda tu cita</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div id="citaAlert" class="alert d-none"></div>
+
+          <div class="cita-toolbar">
+            <div class="row g-3 align-items-end">
+              <div class="col-lg-4">
+                <label class="form-label fw-semibold">Servicio / Agenda</label>
+                <input id="citaSchedule" type="text" class="form-control" placeholder="Ingresa el servicio">
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label fw-semibold">Sede</label>
+                <input id="citaBranch" type="text" class="form-control" placeholder="Ingresa la sede">
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label fw-semibold">Fecha</label>
+                <div class="d-flex gap-2">
+                  <input id="citaFecha" type="date" class="form-control"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Horarios disponibles</label>
+            <div id="citaSlots"></div>
+          </div>
+
+          <hr class="my-3">
+
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label fw-semibold">Nombre</label><input id="citaFirst" class="form-control" placeholder="Nombre"></div>
+            <div class="col-md-6"><label class="form-label fw-semibold">Apellido</label><input id="citaLast" class="form-control" placeholder="Apellido"></div>
+            <div class="col-md-6"><label class="form-label fw-semibold">No. de estudiante</label><input id="citaDni" class="form-control" placeholder="123456"></div>
+            <div class="col-md-6"><label class="form-label fw-semibold">Email</label><input id="citaMail" type="email" class="form-control" placeholder="correo@dominio.com"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="me-auto cita-legend">Selecciona un horario para habilitar la confirmación.</div>
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button id="citaConfirmar" class="btn btn-primary" disabled>Confirmar cita</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: Turno virtual ===== -->
+  <div class="modal fade" id="modalAsesoriaForm" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-camera-video me-2"></i>Generar turno</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="as2Alert" class="alert d-none"></div>
+          <form id="as2Form" class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nombre</label>
+              <input type="text" class="form-control" name="firstName" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Apellidos</label>
+              <input type="text" class="form-control" name="lastName" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">DNI</label>
+              <input type="text" class="form-control" name="dni" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Teléfono</label>
+              <input type="tel" class="form-control" name="phone" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" class="form-control" name="email" required>
+            </div>
+          </form>
+          <div class="small text-muted mt-2">
+            Al continuar, te asignaremos un turno y verás una sala de espera. Cuando el asesor esté listo, podrás iniciar una videollamada.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button id="btnSolicitarAsesoria" class="btn btn-primary">
+            <i class="bi bi-check2-circle me-1"></i>Generar turno
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sala de espera SIN código de turno -->
+  <div class="modal fade modal-wait" id="modalSalaEsperaAcad" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-clock-history me-2"></i>Sala de espera</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" id="btnCloseWaitAcad"></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center mb-4">
+            <div class="mb-3">
+              <span class="badge badge-live rounded-pill px-3 py-2">
+                <i class="bi bi-check2-circle me-1"></i>Turno Reservado Exitosamente
+              </span>
+            </div>
+            <div class="mb-3">
+              <div class="d-inline-flex align-items-center gap-2">
+                <span class="fw-bold" style="font-size: 1.5rem;">Número de Turno: <span id="acadTurnNumber">—</span></span>
+                <span 
+                  class="tooltip-discreto" 
+                  style="cursor: pointer; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #9ca3af; opacity: 0.6;"
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  data-bs-title="Código: —"
+                  id="acadTurnCodeTooltip">
+                  ?
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Estado del Turno:</div>
+                <div class="info-value status-warn" id="acadTurnStatus">Consultando...</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Tiempo Estimado de Atención:</div>
+                <div class="info-value" id="acadAvgWait">N/A</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Servicio:</div>
+                <div class="info-value" id="acadQueueName">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-3" id="acadVideoActionArea" style="display:none;">
+            <div class="alert alert-info mb-3">
+              <i class="bi bi-info-circle me-2"></i>Próximamente se habilitará el botón de acceso a la videollamada.
+            </div>
+            <button id="acadBtnJoinVideo" class="btn btn-success" disabled>
+              🎥 Unirse a la videollamada
+            </button>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="alternatives-section">
+            <div class="alternatives-title">Si no quieres esperar, también puedes:</div>
+            <div class="alternatives-buttons">
+              <div class="alternatives-row">
+                <a href="https://citas.debmedia.com/#/company/Mapfre/schedule" target="_blank" class="alternative-btn btn-cita">
+                  <i class="bi bi-calendar-check"></i>
+                  <span>Generar cita</span>
+                </a>
+                <a href="https://wa.me/5215560404738?text=Hola,%20Asistente%20IA%20de%20Mapfre." target="_blank" class="alternative-btn btn-whatsapp">
+                  <i class="bi bi-whatsapp"></i>
+                  <span>Chatbot whatsapp</span>
+                </a>
+              </div>
+              <button type="button" class="alternative-btn btn-agent" disabled>
+                <i class="bi bi-person-headset"></i>
+                <span>Hablar con un agente disponible</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script para forzar color correcto en campos autocompletados -->
+  <script>
+    (function() {
+      function fixAutofillColors() {
+        const inputs = document.querySelectorAll('input.form-control, input[type="text"], input[type="email"], input[type="tel"]');
+        inputs.forEach(input => {
+          // Aplicar estilos directamente para forzar el color blanco
+          input.style.setProperty('background-color', 'white', 'important');
+          input.style.setProperty('color', '#212529', 'important');
+          
+          // Escuchar eventos para mantener el color
+          ['focus', 'blur', 'input'].forEach(eventType => {
+            input.addEventListener(eventType, function() {
+              this.style.setProperty('background-color', 'white', 'important');
+              this.style.setProperty('color', '#212529', 'important');
+            }, { once: false });
+          });
+        });
+      }
+      
+      // Ejecutar al cargar la página
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', fixAutofillColors);
+      } else {
+        fixAutofillColors();
+      }
+      
+      // También ejecutar cuando se abren los modales
+      document.addEventListener('shown.bs.modal', function() {
+        setTimeout(fixAutofillColors, 50);
+      });
+    })();
+  </script>
+
+  <!-- ===== Flujo Turno / Videollamada (Fila Virtual) - EXISTENTE ===== -->
+  <script>
+    const FV_TOKEN   = 'HjbSIRuS9r8KtMzQG2JJq7daIUElhVcFgnEJZZok';
+    const FV_QUEUE   = 15521;        // flujo existente (no solicitado), dejar como estaba si se usa en otro botón
+    const FV_BRANCH  = 10730;       // sucursal proporcionada
+    const FV_BASE    = 'https://filavirtual2.debmedia.com/api/v1';
+    const VIDEO_CALL_URL = 'about:blank';
+
+    let pollingInterval = null;
+    let lastTurnCode = null;
+
+    const btnTurnoPresencial = document.getElementById('btnTurnoPresencial');
+    const modalForm = new bootstrap.Modal(document.getElementById('modalGuardiaForm'));
+    const modalWait = new bootstrap.Modal(document.getElementById('modalSalaEspera'), { backdrop: 'static', keyboard: false });
+    const modalVideo = new bootstrap.Modal(document.getElementById('modalVideo'), { backdrop:'static' });
+    const formEl = document.getElementById('guardiaForm');
+    const formAlert = document.getElementById('formAlert');
+    const btnEnviarTurno = document.getElementById('btnEnviarTurno');
+    const $ = (id)=> document.getElementById(id);
+
+    function setFormAlert(type, msg){ formAlert.className = `alert alert-${type}`; formAlert.textContent = msg; formAlert.classList.remove('d-none'); }
+    function clearFormAlert(){ formAlert.className = 'alert d-none'; formAlert.textContent = ''; }
+
+    if (btnTurnoPresencial) {
+      btnTurnoPresencial.addEventListener('click', ()=>{ clearFormAlert(); formEl.reset(); modalForm.show(); });
+    }
+
+    // Permitir avanzar con Enter en el formulario
+    if (formEl) {
+      formEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const inputs = Array.from(formEl.querySelectorAll('input'));
+          const currentIndex = inputs.indexOf(e.target);
+          if (currentIndex < inputs.length - 1) {
+            inputs[currentIndex + 1].focus();
+          } else {
+            btnEnviarTurno.click();
+          }
+        }
+      });
+    }
+
+    btnEnviarTurno.addEventListener('click', async ()=>{
+      clearFormAlert();
+      const data = Object.fromEntries(new FormData(formEl).entries());
+      if(!data.firstName || !data.lastName || !data.dni || !data.email || !data.phone){ setFormAlert('danger','Completa todos los campos.'); return; }
+      btnEnviarTurno.disabled = true; btnEnviarTurno.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generando...';
+      try{
+        const url = `${FV_BASE}/queue/${FV_QUEUE}/branch/${FV_BRANCH}/enqueue`;
+        const res = await fetch(url, { method:'POST', headers:{ 'x-api-token': FV_TOKEN, 'Content-Type':'application/json' }, body: JSON.stringify({ firstName:data.firstName, lastName:data.lastName, dni:data.dni, email:data.email, phone:data.phone })});
+        const out = await res.json().catch(()=> ({}));
+        if(!res.ok) throw new Error(out?.message || `Error en servidor (${res.status})`);
+        const turnCode = out.code || '—'; lastTurnCode = turnCode; localStorage.setItem('turnCode', turnCode);
+        const turnNumber = out.jsonDetails?.turn || out.jsonDetails?.actualTurn || '—';
+        const avgWait    = out.jsonDetails?.averageWaitingTime ?? out.jsonDetails?.serviceTime ?? 'N/A';
+        const queueName  = out.jsonDetails?.queue?.name || '—';
+        const wrName     = out.jsonDetails?.waitingRoom?.name || '—';
+        fillWaitModal({ code:turnCode, number:turnNumber, avgWait:isFinite(avgWait)?`${Math.floor(parseFloat(avgWait))} min`:'N/A', queueName, waitingRoom:wrName });
+        modalForm.hide(); modalWait.show(); startPolling(turnCode);
+      }catch(err){ setFormAlert('danger', err.message);
+      }finally{ btnEnviarTurno.disabled = false; btnEnviarTurno.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Generar turno'; }
+    });
+
+    function fillWaitModal({code, number, avgWait, queueName}){
+      // Actualizar número de turno
+      $('turnNumber').textContent = number;
+      
+      // Actualizar tooltip con código de turno
+      const tooltipEl = document.getElementById('turnCodeTooltip');
+      if (tooltipEl) {
+        tooltipEl.setAttribute('data-bs-title', `Código: ${code}`);
+        // Reinicializar tooltip de Bootstrap
+        const tooltip = bootstrap.Tooltip.getInstance(tooltipEl);
+        if (tooltip) {
+          tooltip.dispose();
+        }
+        new bootstrap.Tooltip(tooltipEl);
+      }
+      
+      $('avgWaitingTime').textContent = avgWait;
+      $('queueName').textContent = queueName;
+
+      const st = $('turnStatus');
+      st.textContent = 'Consultando...';
+      st.className = 'info-value status-warn';
+    }
+
+    function startPolling(turnCode){
+      stopPolling();
+      const url = `${FV_BASE}/turn/code/${encodeURIComponent(turnCode)}`;
+
+      const tick = async ()=>{
+        try{
+          const res = await fetch(url, { headers: { 'x-api-token': FV_TOKEN, 'Content-Type':'text/plain' }});
+          if(!res.ok) throw new Error(`Estado no disponible (${res.status})`);
+          const data = await res.json();
+
+          const st = $('turnStatus');
+          if (data.status === 'ANNOUNCED'){
+            st.textContent = '¡Le estamos llamando!';
+            st.className = 'info-value status-call';
+          } else if (data.status === 'WAITING_TO_BE_CALLED'){
+            st.textContent = 'En breve lo llamaremos';
+            st.className = 'info-value status-warn';
+          } else if (data.status === 'FINALIZED'){
+            st.textContent = 'Atención finalizada';
+            st.className = 'info-value status-done';
+          } else {
+            st.textContent = data.status || 'Desconocido';
+            st.className = 'info-value status-warn';
+          }
+
+          const avg = (data.averageWaitingTime ?? data.serviceTime);
+          if (avg!==undefined && avg!==null && !isNaN(avg)){
+            $('avgWaitingTime').textContent = `${Math.floor(parseFloat(avg))} min`;
+          }
+        }catch(e){
+          const st = $('turnStatus');
+          st.textContent = 'Error al consultar';
+          st.className = 'info-value status-err';
+        }
+      };
+
+      tick();
+      pollingInterval = setInterval(tick, 5000);
+    }
+
+    function stopPolling(){ if(pollingInterval){ clearInterval(pollingInterval); pollingInterval = null; } }
+    document.getElementById('btnCloseWait').addEventListener('click', stopPolling);
+
+    // Este botón no existe en el DOM; proteger para evitar error
+    const maybeBtnAbrirVideo = document.getElementById('btnAbrirVideo');
+    if (maybeBtnAbrirVideo){
+      maybeBtnAbrirVideo.addEventListener('click', ()=>{ openVideoModal({ width:'90vw', height:'80vh', url: VIDEO_CALL_URL }); });
+    }
+
+    document.getElementById('btnResizeVideo').addEventListener('click', ()=>{
+      const dlg = document.querySelector('#modalVideo .modal-dialog');
+      const curW = dlg.style.getPropertyValue('--video-width') || '90vw';
+      const nextW = (curW.trim()==='90vw') ? '70vw' : '90vw';
+      const nextH = (nextW==='70vw') ? '60vh' : '80vh';
+      dlg.style.setProperty('--video-width', nextW);
+      document.querySelector('#modalVideo .modal-content').style.setProperty('--video-height', nextH);
+    });
+    function openVideoModal({width='90vw', height='80vh', url='about:blank'}={}){ const dlg=document.querySelector('#modalVideo .modal-dialog'); const content=document.querySelector('#modalVideo .modal-content'); dlg.style.setProperty('--video-width',width); content.style.setProperty('--video-height',height); document.getElementById('videoFrame').src=url; modalVideo.show(); }
+  </script>
+
+  <!-- ===== MÓDULO DE CITAS ===== -->
+  <script>
+    (function(){
+      const API_TOKEN = 'Xrhp9xJMi5Yl7tWE5uW60WDJm4KrqJXf6Z6KKnrX';
+      const SVC_LIST   = 'https://citas2.debmedia.com/api/v2/reducedSchedules';
+      const AVAIL_BASE = 'https://citas2.debmedia.com/api/v2/schedules';
+      const APPT_URL   = 'https://citas2.debmedia.com/api/v2/appointments';
+
+      const modalEl = document.getElementById('modalCita');
+      const modal = new bootstrap.Modal(modalEl);
+      const btnById = document.getElementById('btnAgendaCita');
+      const btnPrimaryCards = document.querySelectorAll('.ad-card .btn.btn-primary');
+      const alertBox = document.getElementById('citaAlert');
+      const selSchedule = document.getElementById('citaSchedule');
+      const selBranch   = document.getElementById('citaBranch');
+      const inputFecha  = document.getElementById('citaFecha');
+      const slotsWrap   = document.getElementById('citaSlots');
+      const btnConfirm  = document.getElementById('citaConfirmar');
+
+      const inFirst = document.getElementById('citaFirst');
+      const inLast  = document.getElementById('citaLast');
+      const inDni   = document.getElementById('citaDni');
+      const inMail  = document.getElementById('citaMail');
+
+      let schedules = [];
+      let selectedSlot = null;
+
+      // Solo activar si existe el botón específico de "Agendar cita"
+      if (btnById) {
+        btnById.removeAttribute('disabled');
+        btnById.addEventListener('click', async () => {
+          resetForm();
+          modal.show();
+          await loadSchedules();
+        });
+      }
+
+      // Permitir avanzar con Enter en los campos del formulario de citas
+      const citaInputs = [inFirst, inLast, inDni, inMail];
+      citaInputs.forEach((input, index) => {
+        if (input) {
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              if (index < citaInputs.length - 1 && citaInputs[index + 1]) {
+                citaInputs[index + 1].focus();
+              } else if (btnConfirm && !btnConfirm.disabled) {
+                btnConfirm.click();
+              }
+            }
+          });
+        }
+      });
+
+      const pad = n => String(n).padStart(2,'0');
+
+      function setAlert(type, msg){ alertBox.className = `alert alert-${type}`; alertBox.textContent = msg; alertBox.classList.remove('d-none'); }
+      function clearAlert(){ alertBox.className = 'alert d-none'; alertBox.textContent=''; }
+
+      function resetForm(){
+        clearAlert();
+        selSchedule.value = '';
+        selBranch.value = '';
+        selBranch.disabled = false;
+        inputFecha.value = '';
+        inputFecha.disabled = false;
+        slotsWrap.innerHTML = '';
+        selectedSlot = null;
+        btnConfirm.disabled = true;
+        inFirst.value = ''; inLast.value = ''; inDni.value = ''; inMail.value = '';
+      }
+
+      async function loadSchedules(){
+        try{
+          const res = await fetch(SVC_LIST, { headers: { 'x-api-token': API_TOKEN } });
+          if(!res.ok) throw new Error(`No se pudieron obtener las agendas (${res.status})`);
+          schedules = await res.json();
+
+          const today = new Date();
+          const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+          inputFecha.min = ymd(today);
+          inputFecha.disabled = false;
+
+          selSchedule.oninput = handleScheduleChange;
+          selBranch.oninput = handleBranchOrDateChange;
+          inputFecha.onchange = handleBranchOrDateChange;
+
+        }catch(err){ setAlert('danger', err.message); }
+      }
+
+      function handleScheduleChange(){
+        const schedId = selSchedule.value;
+        slotsWrap.innerHTML = '';
+        btnConfirm.disabled = true;
+        clearAlert();
+      }
+
+      async function handleBranchOrDateChange(){
+        clearAlert();
+        slotsWrap.innerHTML = '';
+        selectedSlot = null;
+        btnConfirm.disabled = true;
+
+        const schedId = selSchedule.value;
+        const branchId = selBranch.value;
+        const dateStr  = inputFecha.value;
+
+        if(!schedId || !branchId || !dateStr){ return; }
+        
+        // Buscar el schedule por nombre o ID
+        const sched = schedules.find(s => String(s.id) === String(schedId) || s.name.toLowerCase().includes(schedId.toLowerCase()));
+        if(!sched) { setAlert('warning','Servicio no encontrado. Verifica el nombre ingresado.'); return; }
+
+        try{
+          // Buscar branch por nombre o ID
+          const branch = sched.branches?.find(b => String(b.id) === String(branchId) || b.name.toLowerCase().includes(branchId.toLowerCase()));
+          if(!branch) { setAlert('warning','Sede no encontrada. Verifica el nombre ingresado.'); return; }
+          
+          const url = `${AVAIL_BASE}/${encodeURIComponent(sched.id)}/branch/${encodeURIComponent(branch.id)}/availability?strDate=${encodeURIComponent(dateStr)}`;
+          const res = await fetch(url, { headers: { 'x-api-token': API_TOKEN }});
+          if(!res.ok) throw new Error(`No se pudo obtener disponibilidad (${res.status})`);
+          const data = await res.json();
+
+          const slots = Array.isArray(data) ? data : (Array.isArray(data.slots) ? data.slots : []);
+          if(slots.length === 0){ setAlert('info','No hay horarios disponibles para la fecha seleccionada.'); return; }
+
+          const frag = document.createDocumentFragment();
+          slots.forEach(slot=>{
+            const hora = slot.zonedStartDate.substring(11,16);
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-light';
+            btn.textContent = hora;
+            btn.addEventListener('click', ()=>{
+              [...slotsWrap.querySelectorAll('.btn')].forEach(b=>b.classList.remove('active'));
+              btn.classList.add('active');
+              selectedSlot = { startAt: slot.zonedStartDate, defaultDuration: (slot.defaultDuration||0) };
+              btnConfirm.disabled = false;
+            });
+            frag.appendChild(btn);
+          });
+          slotsWrap.appendChild(frag);
+
+        }catch(err){ setAlert('danger', err.message); }
+      }
+
+      // Helpers para generar endAt con el MISMO offset que startAt (formato ...HH:mm:ss-0300)
+      function minutesOffsetFromSuffix(suffix){
+        const m = suffix.match(/^([+-])(\d{2})(\d{2})$/);
+        if(!m) return 0;
+        const sign = m[1] === '-' ? -1 : 1;
+        return sign * (parseInt(m[2],10)*60 + parseInt(m[3],10));
+      }
+      function buildEndAtLikeStart(startAtStr, addMinutes){
+        const offsetMatch = startAtStr.match(/([+-]\d{4}|Z)$/);
+        const offsetSuffix = offsetMatch ? offsetMatch[1] : 'Z';
+        const offsetMin = offsetSuffix==='Z' ? 0 : minutesOffsetFromSuffix(offsetSuffix);
+        const msStart = new Date(startAtStr).getTime();
+        const msEnd = msStart + (addMinutes*60000);
+        const d = new Date(msEnd + offsetMin*60000);
+        const Y = d.getUTCFullYear(), M = d.getUTCMonth()+1, D = d.getUTCDate();
+        const H = d.getUTCHours(), m = d.getUTCMinutes(), S = d.getUTCSeconds();
+        const pad = n=>String(n).padStart(2,'0');
+        return `${Y}-${pad(M)}-${pad(D)}T${pad(H)}:${pad(m)}:${pad(S)}${offsetSuffix}`;
+      }
+
+      btnConfirm.addEventListener('click', async ()=>{
+        clearAlert();
+        if(!selectedSlot){ setAlert('danger','Selecciona un horario primero.'); return; }
+        const schedId = selSchedule.value;
+        const branchId = selBranch.value;
+        if(!schedId || !branchId){ setAlert('danger','Faltan servicio o sucursal.'); return; }
+        if(!inFirst.value || !inLast.value || !inDni.value){ setAlert('danger','Completa Nombre, Apellido y Documento.'); return; }
+        
+        // Buscar schedule y branch
+        const sched = schedules.find(s => String(s.id) === String(schedId) || s.name.toLowerCase().includes(schedId.toLowerCase()));
+        if(!sched) { setAlert('danger','Servicio no encontrado.'); return; }
+        const branch = sched.branches?.find(b => String(b.id) === String(branchId) || b.name.toLowerCase().includes(branchId.toLowerCase()));
+        if(!branch) { setAlert('danger','Sede no encontrada.'); return; }
+
+        const startAt = selectedSlot.startAt;
+        const endAt   = buildEndAtLikeStart(startAt, selectedSlot.defaultDuration || 0);
+
+        const body = {
+          branch:   { id: Number(branch.id) },
+          schedule: { id: Number(sched.id) },
+          startAt,
+          endAt,
+          customer: {
+            firstName: inFirst.value,
+            lastName:  inLast.value,
+            dni:       String(inDni.value || '').trim(),
+            email:     (inMail.value || '').trim() || undefined
+          },
+          reason: "Cita Universidad Numia"
+        };
+
+        btnConfirm.disabled = true; btnConfirm.textContent = 'Confirmando...';
+
+        try{
+          const res = await fetch('https://citas2.debmedia.com/api/v2/appointments', {
+            method: 'POST',
+            headers: { 'x-api-token': API_TOKEN, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          const out = await res.json().catch(()=> ({}));
+          if(!res.ok){ throw new Error(out?.message || `Error al crear la cita (${res.status})`); }
+          setAlert('success', `¡Cita creada! ID: ${out.id || '(recibido)'}`);
+          setTimeout(()=> modal.hide(), 1400);
+        }catch(err){
+          setAlert('danger', err.message);
+        }finally{
+          btnConfirm.disabled = false; btnConfirm.textContent = 'Confirmar cita';
+        }
+      });
+    })();
+  </script>
+
+  <!-- ===== FLUJO ASESORÍA ACADÉMICA (VIDEOLLAMADA) ===== -->
+  <script>
+    (function(){
+      // Config específica para ASESORÍA ACADÉMICA
+      const ACAD = {
+        TOKEN:  'HjbSIRuS9r8KtMzQG2JJq7daIUElhVcFgnEJZZok',
+        QUEUE:  15520,
+        BRANCH: 10730,
+        BASE:   'https://filavirtual2.debmedia.com/api/v1'
+      };
+      const readyStates = new Set(['ANNOUNCED','CALLING','ATTENDING','IN_PROGRESS']);
+
+      let acadPolling = null;
+      let acadTurnCode = null;
+      let acadVideoUrl = null;
+
+      const btnGenerarTurno = document.getElementById('btnGenerarturno');
+      const modalForm   = new bootstrap.Modal(document.getElementById('modalAsesoriaForm'));
+      const modalWait   = new bootstrap.Modal(document.getElementById('modalSalaEsperaAcad'), { backdrop:'static', keyboard:false });
+      const modalVideo  = new bootstrap.Modal(document.getElementById('modalVideo'), { backdrop:'static' });
+
+      const as2Form = document.getElementById('as2Form');
+      const as2Alert = document.getElementById('as2Alert');
+      const btnSolicitarAsesoria = document.getElementById('btnSolicitarAsesoria');
+      
+      // Si el botón no existe, no inicializar el flujo
+      if (!btnGenerarTurno) return;
+
+      // Campos sala de espera (acad)
+      const elTurnNumber  = document.getElementById('acadTurnNumber');
+      const elTurnStatus  = document.getElementById('acadTurnStatus');
+      const elAvgWait     = document.getElementById('acadAvgWait');
+      const elQueueName   = document.getElementById('acadQueueName');
+      const videoArea     = document.getElementById('acadVideoActionArea');
+      const btnJoinVideo  = document.getElementById('acadBtnJoinVideo');
+      const btnCloseWait  = document.getElementById('btnCloseWaitAcad');
+
+      // Helper para setear query param de forma segura
+      function withParam(url, key, value){
+        try{
+          const u = new URL(url, window.location.origin);
+          u.searchParams.set(key, value);
+          return u.toString();
+        }catch{
+          const sep = url.includes('?') ? '&' : '?';
+          return `${url}${sep}${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+        }
+      }
+
+      function setAs2Alert(type, msg){
+        as2Alert.className = `alert alert-${type}`;
+        as2Alert.textContent = msg;
+        as2Alert.classList.remove('d-none');
+      }
+      function clearAs2Alert(){
+        as2Alert.className = 'alert d-none';
+        as2Alert.textContent = '';
+      }
+
+      // Abrir formulario directamente
+      btnGenerarTurno.addEventListener('click', ()=>{
+        clearAs2Alert();
+        as2Form.reset();
+        modalForm.show();
+      });
+
+      // Permitir avanzar con Enter en el formulario
+      if (as2Form) {
+        as2Form.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const inputs = Array.from(as2Form.querySelectorAll('input'));
+            const currentIndex = inputs.indexOf(e.target);
+            if (currentIndex < inputs.length - 1) {
+              inputs[currentIndex + 1].focus();
+            } else {
+              btnSolicitarAsesoria.click();
+            }
+          }
+        });
+      }
+
+      // Solicitar turno (enqueue)
+      btnSolicitarAsesoria.addEventListener('click', async ()=>{
+        const data = Object.fromEntries(new FormData(as2Form).entries());
+        if (!data.firstName || !data.lastName || !data.dni || !data.email || !data.phone){
+          setAs2Alert('danger', 'Completa todos los campos requeridos.');
+          return;
+        }
+
+        btnSolicitarAsesoria.disabled = true;
+        btnSolicitarAsesoria.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generando turno...';
+
+        try{
+          const url = `${ACAD.BASE}/queue/${ACAD.QUEUE}/branch/${ACAD.BRANCH}/enqueue`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'x-api-token': ACAD.TOKEN, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              firstName: data.firstName,
+              lastName:  data.lastName,
+              dni:       data.dni,
+              email:     data.email,
+              phone:     data.phone
+            })
+          });
+          const out = await res.json().catch(()=> ({}));
+          if (!res.ok) throw new Error(out?.message || `Error en servidor (${res.status})`);
+
+          // Guardar turnCode para polling (NO se muestra)
+          acadTurnCode = out.code || null;
+
+          // Extraer info
+          const json = out.jsonDetails || {};
+          const turnNumber = json.turn || json.actualTurn || '—';
+          const avgWaitRaw = (json.averageWaitingTime ?? json.serviceTime);
+          const avgWait = (avgWaitRaw!==undefined && avgWaitRaw!==null && !isNaN(avgWaitRaw))
+                          ? `${Math.floor(parseFloat(avgWaitRaw))} min` : 'N/A';
+          const queueName = json.queue?.name || 'Asesoría académica';
+
+          // Video URL (varios posibles lugares)
+          acadVideoUrl = out.videoCallUrl || json.videoCallUrl || json.queue?.videoCallUrl || null;
+
+          // Poblar sala de espera académica
+          elTurnNumber.textContent = turnNumber;
+          
+          // Actualizar tooltip con código de turno
+          const tooltipEl = document.getElementById('acadTurnCodeTooltip');
+          if (tooltipEl && acadTurnCode) {
+            tooltipEl.setAttribute('data-bs-title', `Código: ${acadTurnCode}`);
+            // Reinicializar tooltip de Bootstrap
+            const tooltip = bootstrap.Tooltip.getInstance(tooltipEl);
+            if (tooltip) {
+              tooltip.dispose();
+            }
+            new bootstrap.Tooltip(tooltipEl);
+          }
+          
+          elAvgWait.textContent = avgWait;
+          elQueueName.textContent = queueName;
+          elTurnStatus.textContent = 'Consultando...';
+          elTurnStatus.className = 'info-value status-warn';
+          // Mostrar siempre el área de video con mensaje y botón deshabilitado
+          videoArea.style.display = '';
+          btnJoinVideo.disabled = true;
+
+          modalForm.hide();
+          modalWait.show();
+
+          // Iniciar polling
+          if (acadTurnCode){
+            startPollingAcad(acadTurnCode);
+          }
+        }catch(err){
+          setAs2Alert('danger', err.message);
+        }finally{
+          btnSolicitarAsesoria.disabled = false;
+          btnSolicitarAsesoria.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Solicitar asesoría académica';
+        }
+      });
+
+      // Polling del estado del turno académico
+      function startPollingAcad(turnCode){
+        stopPollingAcad();
+        const url = `${ACAD.BASE}/turn/code/${encodeURIComponent(turnCode)}`;
+
+        const tick = async ()=>{
+          try{
+            const res = await fetch(url, { headers: { 'x-api-token': ACAD.TOKEN, 'Content-Type':'text/plain' }});
+            if(!res.ok) throw new Error(`Estado no disponible (${res.status})`);
+            const data = await res.json();
+
+            // Estado
+            let statusText = data.status || 'Desconocido';
+            if (data.status === 'ANNOUNCED'){ statusText = '¡Le estamos llamando!'; elTurnStatus.className = 'info-value status-call'; }
+            else if (data.status === 'WAITING_TO_BE_CALLED'){ statusText = 'En breve lo llamaremos'; elTurnStatus.className = 'info-value status-warn'; }
+            else if (data.status === 'FINALIZED'){ statusText = 'Atención finalizada'; elTurnStatus.className = 'info-value status-done'; }
+            else { elTurnStatus.className = 'info-value status-warn'; }
+            elTurnStatus.textContent = statusText;
+
+            // Tiempo estimado (redondeado)
+            const avg = (data.averageWaitingTime ?? data.serviceTime);
+            if (avg!==undefined && avg!==null && !isNaN(avg)){
+              elAvgWait.textContent = `${Math.floor(parseFloat(avg))} min`;
+            }
+
+            // Siempre mostrar el área de video con mensaje y botón deshabilitado
+            videoArea.style.display = '';
+            btnJoinVideo.disabled = true;
+            
+            // Si el estado permite videollamada, guardar URL (pero mantener botón deshabilitado)
+            if (readyStates.has(data.status)){
+              acadVideoUrl = acadVideoUrl || data.videoCallUrl || null;
+            }
+          }catch(e){
+            elTurnStatus.textContent = 'Error al consultar';
+            elTurnStatus.className = 'info-value status-err';
+          }
+        };
+
+        tick();
+        acadPolling = setInterval(tick, 5000);
+      }
+
+      function stopPollingAcad(){
+        if (acadPolling){
+          clearInterval(acadPolling);
+          acadPolling = null;
+        }
+      }
+
+      // Cerrar sala de espera → detener polling
+      btnCloseWait.addEventListener('click', stopPollingAcad);
+
+      // Utiliza el modal de video existente
+      function openVideoModal({width='90vw', height='80vh', url='about:blank'}={}){
+        const dlg=document.querySelector('#modalVideo .modal-dialog');
+        const content=document.querySelector('#modalVideo .modal-content');
+        dlg.style.setProperty('--video-width',width);
+        content.style.setProperty('--video-height',height);
+        document.getElementById('videoFrame').src=url;
+        modalVideo.show();
+      }
+    })();
+  </script>
+
+</body>
+</html>
