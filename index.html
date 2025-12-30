@@ -600,12 +600,44 @@
                   <span>Chatbot whatsapp</span>
                 </a>
               </div>
-              <button type="button" class="alternative-btn btn-agent" disabled>
+              <button type="button" class="alternative-btn btn-agent" id="btnDejarDatos">
                 <i class="bi bi-person-headset"></i>
-                <span>Hablar con un agente disponible</span>
+                <span>Dejar mis datos para que me llamen</span>
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: Confirmación de datos dejados ===== -->
+  <div class="modal fade" id="modalConfirmacionDatos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-body text-center py-4">
+          <div class="mb-3">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+          </div>
+          <h6 class="mb-3 fw-bold">Gracias por dejarnos tus datos, un agente se pondrá en contacto contigo.</h6>
+          <div class="mt-4">
+            <small class="text-muted d-block mb-2">Número de turno:</small>
+            <div class="d-inline-flex align-items-center gap-2">
+              <span class="fw-semibold" id="confirmacionTurnNumber">—</span>
+              <span 
+                class="tooltip-discreto" 
+                style="cursor: pointer; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #9ca3af; opacity: 0.6;"
+                data-bs-toggle="tooltip" 
+                data-bs-placement="top" 
+                data-bs-title="Código: —"
+                id="confirmacionTurnCodeTooltip">
+                ?
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center border-0 pt-0">
+          <button type="button" class="btn btn-primary" id="btnContinuarConfirmacion">Continuar</button>
         </div>
       </div>
     </div>
@@ -1029,15 +1061,18 @@
       let acadPolling = null;
       let acadTurnCode = null;
       let acadVideoUrl = null;
+      let acadFormData = null; // Guardar datos del formulario para reutilizar
 
       const btnGenerarTurno = document.getElementById('btnGenerarturno');
       const modalForm   = new bootstrap.Modal(document.getElementById('modalAsesoriaForm'));
       const modalWait   = new bootstrap.Modal(document.getElementById('modalSalaEsperaAcad'), { backdrop:'static', keyboard:false });
       const modalVideo  = new bootstrap.Modal(document.getElementById('modalVideo'), { backdrop:'static' });
+      const modalConfirmacion = new bootstrap.Modal(document.getElementById('modalConfirmacionDatos'));
 
       const as2Form = document.getElementById('as2Form');
       const as2Alert = document.getElementById('as2Alert');
       const btnSolicitarAsesoria = document.getElementById('btnSolicitarAsesoria');
+      const btnDejarDatos = document.getElementById('btnDejarDatos');
       
       // Si el botón no existe, no inicializar el flujo
       if (!btnGenerarTurno) return;
@@ -1104,6 +1139,15 @@
           return;
         }
 
+        // Guardar datos del formulario para reutilizar en el segundo turno
+        acadFormData = {
+          firstName: data.firstName,
+          lastName:  data.lastName,
+          dni:       data.dni,
+          email:     data.email,
+          phone:     data.phone
+        };
+
         btnSolicitarAsesoria.disabled = true;
         btnSolicitarAsesoria.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generando turno...';
 
@@ -1112,19 +1156,14 @@
           const res = await fetch(url, {
             method: 'POST',
             headers: { 'x-api-token': ACAD.TOKEN, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              firstName: data.firstName,
-              lastName:  data.lastName,
-              dni:       data.dni,
-              email:     data.email,
-              phone:     data.phone
-            })
+            body: JSON.stringify(acadFormData)
           });
           const out = await res.json().catch(()=> ({}));
           if (!res.ok) throw new Error(out?.message || `Error en servidor (${res.status})`);
 
           // Guardar turnCode para polling (NO se muestra)
           acadTurnCode = out.code || null;
+          console.log('Código del primer turno guardado:', acadTurnCode);
 
           // Extraer info
           const json = out.jsonDetails || {};
@@ -1227,6 +1266,104 @@
 
       // Cerrar sala de espera → detener polling
       btnCloseWait.addEventListener('click', stopPollingAcad);
+
+      // Botón "Dejar mis datos para que me llamen" - Crear segundo turno
+      if (btnDejarDatos) {
+        btnDejarDatos.addEventListener('click', async () => {
+          // Verificar que tenemos los datos del formulario guardados
+          if (!acadFormData) {
+            alert('No se encontraron los datos del formulario. Por favor, genera un turno primero.');
+            return;
+          }
+
+          // Deshabilitar botón mientras se procesa
+          btnDejarDatos.disabled = true;
+          const originalHTML = btnDejarDatos.innerHTML;
+          btnDejarDatos.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
+
+          try {
+            // Cancelar el primer turno antes de crear el segundo
+            if (acadTurnCode) {
+              try {
+                // Construir URL de cancelación: https://filavirtual2.debmedia.com/api/v1/turn/{code}/cancel
+                const cancelUrl = `${ACAD.BASE}/turn/${acadTurnCode}/cancel`;
+                console.log('Intentando cancelar turno:', cancelUrl, 'Código:', acadTurnCode);
+                
+                const cancelRes = await fetch(cancelUrl, {
+                  method: 'POST',
+                  headers: { 'x-api-token': ACAD.TOKEN, 'Content-Type': 'application/json' }
+                });
+                
+                const cancelOut = await cancelRes.json().catch(()=> ({}));
+                
+                if (cancelRes.ok) {
+                  // Detener el polling del primer turno ya que se canceló
+                  stopPollingAcad();
+                  console.log('Primer turno cancelado exitosamente:', acadTurnCode);
+                } else {
+                  console.warn('Error al cancelar el primer turno. Status:', cancelRes.status, 'Response:', cancelOut);
+                }
+              } catch (cancelErr) {
+                // Si falla la cancelación, continuamos de todas formas
+                console.error('Excepción al cancelar el primer turno:', cancelErr);
+              }
+            } else {
+              console.warn('No hay código de turno para cancelar. acadTurnCode es:', acadTurnCode);
+            }
+
+            // Crear segundo turno con queid: 16743, mismo token y branchid
+            const CALLBACK_QUEUE = 16743;
+            const url = `${ACAD.BASE}/queue/${CALLBACK_QUEUE}/branch/${ACAD.BRANCH}/enqueue`;
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: { 'x-api-token': ACAD.TOKEN, 'Content-Type': 'application/json' },
+              body: JSON.stringify(acadFormData)
+            });
+            const out = await res.json().catch(()=> ({}));
+            if (!res.ok) throw new Error(out?.message || `Error en servidor (${res.status})`);
+
+            // Extraer información del turno
+            const turnCode = out.code || '—';
+            const json = out.jsonDetails || {};
+            const turnNumber = json.turn || json.actualTurn || '—';
+
+            // Mostrar modal de confirmación
+            const confirmacionTurnNumber = document.getElementById('confirmacionTurnNumber');
+            const confirmacionTooltip = document.getElementById('confirmacionTurnCodeTooltip');
+            
+            if (confirmacionTurnNumber) {
+              confirmacionTurnNumber.textContent = turnNumber;
+            }
+            
+            if (confirmacionTooltip && turnCode) {
+              confirmacionTooltip.setAttribute('data-bs-title', `Código: ${turnCode}`);
+              // Reinicializar tooltip de Bootstrap
+              const tooltip = bootstrap.Tooltip.getInstance(confirmacionTooltip);
+              if (tooltip) {
+                tooltip.dispose();
+              }
+              new bootstrap.Tooltip(confirmacionTooltip);
+            }
+
+            // Mostrar modal de confirmación
+            modalConfirmacion.show();
+          } catch(err) {
+            alert('Error al crear el turno: ' + err.message);
+          } finally {
+            btnDejarDatos.disabled = false;
+            btnDejarDatos.innerHTML = originalHTML;
+          }
+        });
+      }
+
+      // Botón "Continuar" en modal de confirmación - Cerrar ambos modales
+      const btnContinuarConfirmacion = document.getElementById('btnContinuarConfirmacion');
+      if (btnContinuarConfirmacion) {
+        btnContinuarConfirmacion.addEventListener('click', () => {
+          modalConfirmacion.hide();
+          modalWait.hide();
+        });
+      }
 
       // Utiliza el modal de video existente
       function openVideoModal({width='90vw', height='80vh', url='about:blank'}={}){
