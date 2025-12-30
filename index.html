@@ -1014,7 +1014,7 @@
     })();
   </script>
 
-  <!-- ===== FLUJO ASESORÍA ACADÉMICA (VIDEOLLAMADA) ===== -->
+  <!-- ===== FLUJO Atención Agentes (VIDEOLLAMADA) ===== -->
   <script>
     (function(){
       // Config específica para ASESORÍA ACADÉMICA
@@ -1132,7 +1132,7 @@
           const avgWaitRaw = (json.averageWaitingTime ?? json.serviceTime);
           const avgWait = (avgWaitRaw!==undefined && avgWaitRaw!==null && !isNaN(avgWaitRaw))
                           ? `${Math.floor(parseFloat(avgWaitRaw))} min` : 'N/A';
-          const queueName = json.queue?.name || 'Asesoría académica';
+          const queueName = json.queue?.name || 'Asesoría';
 
           // Video URL (varios posibles lugares)
           acadVideoUrl = out.videoCallUrl || json.videoCallUrl || json.queue?.videoCallUrl || null;
@@ -1171,7 +1171,7 @@
           setAs2Alert('danger', err.message);
         }finally{
           btnSolicitarAsesoria.disabled = false;
-          btnSolicitarAsesoria.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Solicitar asesoría académica';
+          btnSolicitarAsesoria.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Solicitar asesor';
         }
       });
 
